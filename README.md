@@ -1,27 +1,87 @@
-# 🚀 Task - Kubernetes Setup on AWS EC2
+# 🚀 Kubernetes Nginx Deployment
 
-## 📌 Overview
-This task demonstrates how to set up **Docker**, **kubectl**, and **Minikube** on an AWS EC2 instance.
-
----
-
-## 🛠 Tools & Technologies Used
-- AWS EC2 (Ubuntu)
-- Docker
-- Kubernetes CLI (kubectl)
-- Minikube
+## 📌 Project Overview
+This project demonstrates deploying an **Nginx web server** on a Kubernetes cluster using `kubectl`.  
+We create a **Deployment**, expose it as a **NodePort Service**, and access it externally via the server's public IP.
 
 ---
 
-## ⚙️ Steps Performed
-1. **Launched an AWS EC2 Instance**
-   - Ubuntu 22.04 LTS  
-   - Configured inbound security group to allow **SSH (22)** and **HTTP/HTTPS (80, 443)**, and **custom ports** if needed.
+## 🧰 Tools & Technologies Used
+- **Docker** – Containerization platform
+- **kubectl** – Kubernetes command-line tool
+- **Minikube / Kubernetes cluster** – Container orchestration platform
+- **AWS EC2** – Cloud instance hosting the Kubernetes cluster
 
-2. **Installed Docker**
-   ```bash
-   sudo apt update
-   sudo apt install -y docker.io
-   sudo systemctl enable docker
-   sudo systemctl start docker
-   docker --version
+---
+
+## 📂 Files in This Repository
+1. **`deployment.yaml`** – Kubernetes manifest for Nginx deployment.
+2. **`service.yaml`** – Kubernetes manifest for exposing Nginx service via NodePort.
+3. **`screenshots/`** – Screenshots showing commands and outputs.
+4. **`README.md`** – Project documentation (this file).
+
+---
+
+## 🛠 Steps Performed
+
+### 1️⃣ Install Prerequisites
+Installed the following on the EC2 instance:
+'bash
+sudo apt update
+sudo apt install -y docker.io
+sudo apt install -y apt-transport-https ca-certificates curl
+sudo snap install kubectl --classic
+Also installed minikube to create a local Kubernetes cluster.
+
+2️⃣ Start Kubernetes Cluster
+bash
+Copy
+Edit
+minikube start --driver=docker
+kubectl get nodes
+Verified that the control-plane node is ready.
+
+3️⃣ Create Deployment
+Used kubectl to create a deployment running Nginx:
+
+bash
+Copy
+Edit
+kubectl create deployment hello-deployment --image=nginx
+kubectl get deployments
+4️⃣ Expose Deployment via NodePort
+Created a service to expose the Nginx deployment:
+
+bash
+Copy
+Edit
+kubectl expose deployment hello-deployment --type=NodePort --port=80
+kubectl get svc
+Example output:
+
+pgsql
+Copy
+Edit
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+hello-deployment   NodePort    10.96.225.0     <none>        80:31074/TCP   1m
+kubernetes         ClusterIP   10.96.0.1       <none>        443/TCP        83d
+5️⃣ Access Application Externally
+Checked the EC2 public IP:
+
+bash
+Copy
+Edit
+curl ifconfig.me
+Example output:
+
+Copy
+Edit
+13.49.102.108
+Opened AWS Security Group and allowed NodePort range (30000–32767) in inbound rules.
+
+Accessed in browser:
+
+cpp
+Copy
+Edit
+http://13.49.102.108:31074
